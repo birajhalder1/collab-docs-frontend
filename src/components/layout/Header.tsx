@@ -9,7 +9,7 @@ export default function Header() {
     <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6">
       {/* Left Section */}
       <div className="flex items-center gap-4">
-        <h2 className="text-2xl font-bold text-slate-800">Dashboard</h2>
+        {/* <h2 className="text-2xl font-bold text-slate-800">Dashboard</h2> */}
 
         <div className="relative hidden md:block">
           <Search size={18} className="absolute left-3 top-3 text-slate-400" />
