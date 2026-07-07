@@ -67,7 +67,7 @@ export default function ShareDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="w-[500px] rounded-xl bg-white p-6 shadow-xl">
+      <div className="w-150 rounded-xl bg-white p-6 shadow-xl">
 
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">

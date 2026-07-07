@@ -86,10 +86,11 @@ export default function ShareDialog({
   return (
     <>
       {/* Background */}
-      <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose} />
+      <div className="fixed inset-0 z-40 bg-black/40" />
+      {/* <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose} /> */}
 
       {/* Dialog */}
-      <div className="fixed left-1/2 top-1/2 z-50 w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-6 shadow-2xl">
+      <div className="fixed left-1/2 top-1/2 z-50 w-150] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-6 shadow-2xl">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-xl font-semibold">Share Document</h2>
 

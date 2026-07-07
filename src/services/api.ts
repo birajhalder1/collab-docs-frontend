@@ -1,24 +1,3 @@
-// import axios from "axios";
-// import { useAuthStore } from "@/store/auth.store";
-
-// const api = axios.create({
-//   baseURL: "http://localhost:5000/api",
-//   withCredentials: true,
-// });
-
-// api.interceptors.request.use((config) => {
-//   const token = useAuthStore.getState().accessToken;
-// console.log("token", token);
-
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-
-//   return config;
-// });
-
-// export default api;
-
 import axios from "axios";
 import { useAuthStore } from "@/store/auth.store";
 
@@ -27,6 +6,7 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// Attach access token
 api.interceptors.request.use((config) => {
   const token = useAuthStore.getState().accessToken;
 
@@ -37,12 +17,19 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Handle 401
 api.interceptors.response.use(
   (response) => response,
+
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Avoid infinite loop
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes("/auth/refresh")
+    ) {
       originalRequest._retry = true;
 
       try {
@@ -54,17 +41,21 @@ api.interceptors.response.use(
           },
         );
 
-        useAuthStore.getState().setAuth(data.data.user, data.data.accessToken);
+        const { user, accessToken } = data.data;
 
-        originalRequest.headers.Authorization = `Bearer ${data.data.accessToken}`;
+        useAuthStore.getState().setAuth(user, accessToken);
+
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 
         return api(originalRequest);
-      } catch {
+      } catch (refreshError) {
         useAuthStore.getState().logout();
 
-        window.location.href = "/login";
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
+        }
 
-        return Promise.reject(error);
+        return Promise.reject(refreshError);
       }
     }
 

@@ -21,6 +21,8 @@ export default function AuthProvider({
     if (PUBLIC_ROUTES.includes(pathname)) return;
 
     // Already logged in, don't refresh
+    console.log("accessToken", accessToken);
+
     if (accessToken) return;
 
     const restoreSession = async () => {
@@ -28,9 +30,10 @@ export default function AuthProvider({
         const { data } = await api.post("/auth/refresh");
 
         setAuth(data.data.user, data.data.accessToken);
-      } catch {
-        logout();
-        router.replace("/login");
+      } catch (error) {
+        // logout();
+        // router.replace("/login");
+        console.log("Session expired", error);
       }
     };
 
