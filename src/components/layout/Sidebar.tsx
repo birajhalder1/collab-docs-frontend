@@ -11,6 +11,8 @@ import {
   FaArrowRightFromBracket,
   FaBars,
   FaXmark,
+  FaGithub,
+  FaLinkedin,
 } from "react-icons/fa6";
 
 const menus = [
@@ -29,7 +31,6 @@ const menus = [
 export default function Sidebar() {
   const logout = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
-
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -69,8 +70,9 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 z-40 flex h-dvh w-64 flex-col overflow-hidden bg-slate-900 text-white transition-transform duration-300
-          ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
+        className={`fixed left-0 top-0 z-40 flex h-dvh w-64 flex-col overflow-hidden bg-slate-900 text-white transition-transform duration-300 ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0`}
       >
         {/* Mobile Header */}
         <div className="flex items-center justify-between border-b border-slate-800 p-4 md:hidden">
@@ -89,7 +91,7 @@ export default function Sidebar() {
         </div>
 
         {/* Logo */}
-        <div className="border-b border-slate-800 p-6 text-2xl font-bold">
+        <div className="border-b border-slate-800 p-6 text-center text-2xl font-bold">
           Collab Editor
         </div>
 
@@ -108,8 +110,34 @@ export default function Sidebar() {
           ))}
         </nav>
 
-        {/* Logout */}
-        <div className="mt-auto border-t border-slate-800 p-4">
+        {/* Footer */}
+        <div className="border-t border-slate-800 p-4">
+          <p className="mb-3 text-center text-xs uppercase tracking-widest text-slate-400">
+            Connect
+          </p>
+
+          <div className="mb-4 flex justify-center gap-4">
+            <a
+              href="https://github.com/birajhalder1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-slate-800 p-3 transition hover:bg-slate-700"
+              aria-label="GitHub"
+            >
+              <FaGithub size={20} />
+            </a>
+
+            <a
+              href="https://www.linkedin.com/in/biraj-halder-871959173"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-slate-800 p-3 transition hover:bg-blue-600"
+              aria-label="LinkedIn"
+            >
+              <FaLinkedin size={20} />
+            </a>
+          </div>
+
           <button
             onClick={handleLogout}
             className="flex w-full items-center justify-center gap-3 rounded-lg bg-red-600 px-4 py-3 font-medium transition hover:bg-red-700"
