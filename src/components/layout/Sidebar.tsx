@@ -7,8 +7,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   FaFileLines,
-  FaClock,
-  FaGear,
   FaHouse,
   FaArrowRightFromBracket,
   FaBars,
@@ -26,22 +24,14 @@ const menus = [
     href: "/documents",
     icon: FaFileLines,
   },
-  // {
-  //   title: "History",
-  //   href: "/history",
-  //   icon: FaClock,
-  // },
-  // {
-  //   title: "Settings",
-  //   href: "/settings",
-  //   icon: FaGear,
-  // },
 ];
 
 export default function Sidebar() {
   const logout = useAuthStore((state) => state.logout);
-  const router = useRouter();
   const user = useAuthStore((state) => state.user);
+
+  const router = useRouter();
+
   const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -79,15 +69,14 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 z-40 flex h-screen w-64 flex-col bg-slate-900 text-white transition-transform duration-300
-          ${isOpen ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0`}
+        className={`fixed left-0 top-0 z-40 flex h-dvh w-64 flex-col overflow-hidden bg-slate-900 text-white transition-transform duration-300
+          ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
       >
         {/* Mobile Header */}
         <div className="flex items-center justify-between border-b border-slate-800 p-4 md:hidden">
           <div>
             <p className="font-semibold">{user?.name}</p>
-            <p className="text-sm text-slate-500">{user?.email}</p>
+            <p className="text-sm text-slate-400">{user?.email}</p>
           </div>
 
           <button
@@ -105,7 +94,7 @@ export default function Sidebar() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4">
+        <nav className="flex-1 overflow-y-auto p-4">
           {menus.map((menu) => (
             <Link
               key={menu.href}
@@ -120,10 +109,10 @@ export default function Sidebar() {
         </nav>
 
         {/* Logout */}
-        <div className="border-t border-slate-800 p-4">
+        <div className="mt-auto border-t border-slate-800 p-4">
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-lg bg-red-600 px-4 py-3 font-medium transition hover:bg-red-700"
+            className="flex w-full items-center justify-center gap-3 rounded-lg bg-red-600 px-4 py-3 font-medium transition hover:bg-red-700"
           >
             <FaArrowRightFromBracket className="text-lg" />
             <span>Logout</span>
