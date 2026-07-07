@@ -90,7 +90,7 @@ export default function ShareDialog({
       {/* <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose} /> */}
 
       {/* Dialog */}
-      <div className="fixed left-1/2 top-1/2 z-50 w-150] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-6 shadow-2xl">
+      <div className=" fixed left-1/2 top-1/2 z-50 w-[95%] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-4 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto md:max-w-2xl">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-xl font-semibold">Share Document</h2>
 
