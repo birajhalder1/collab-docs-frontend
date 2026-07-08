@@ -4,6 +4,7 @@ export interface DocumentEntity {
   content: string;
   ownerId: string;
   version: number;
+  lamportClock: number;
   createdAt: number;
   updatedAt: number;
   deleted: boolean;

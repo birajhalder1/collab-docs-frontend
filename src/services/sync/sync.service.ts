@@ -14,10 +14,42 @@ export async function syncDocuments() {
   try {
     const queue = await db.syncQueue.orderBy("createdAt").toArray();
 
-    if (queue.length === 0) {
-      await pullAllDocuments();
-      return;
+    // if (queue.length === 0) {
+    //   await pullAllDocuments();
+    //   return;
+    // }
+
+    if (queue.length > 0) {
+      const grouped = queue.reduce(
+        (acc, operation) => {
+          if (!acc[operation.documentId]) {
+            acc[operation.documentId] = [];
+          }
+
+          acc[operation.documentId].push(operation);
+
+          return acc;
+        },
+        {} as Record<string, typeof queue>,
+      );
+
+      for (const [documentId, operations] of Object.entries(grouped)) {
+        const result = await pushOperations(documentId, operations);
+
+        if (!result) continue;
+
+        await db.syncQueue.bulkDelete(operations.map((o) => o.opId));
+
+        await mergeDocument(result);
+
+        await db.documents.update(documentId, {
+          synced: true,
+        });
+      }
     }
+
+    // Always pull latest documents after pushing
+    await pullAllDocuments();
 
     const grouped = queue.reduce(
       (acc, operation) => {
