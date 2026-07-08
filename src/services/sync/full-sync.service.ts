@@ -8,6 +8,7 @@ export async function pullAllDocuments() {
   const response = await api.get("/documents");
 
   const serverDocuments = response.data.data;
+  console.log("serverDoc", serverDocuments);
 
   for (const serverDoc of serverDocuments) {
     // Check if the document already exists locally
@@ -19,11 +20,13 @@ export async function pullAllDocuments() {
         id: serverDoc.id,
         title: serverDoc.title,
         content: serverDoc.content,
+        role: serverDoc.role,
+        isOwner: serverDoc.isOwner,
         version: serverDoc.version,
         lamportClock: serverDoc.lamportClock,
         updatedAt: new Date(serverDoc.updatedAt).getTime(),
         createdAt: new Date(serverDoc.updatedAt).getTime(),
-        ownerId: serverDoc.isOwner,
+        ownerId: serverDoc.ownerId,
         synced: true,
         deleted: false,
       });
@@ -31,12 +34,21 @@ export async function pullAllDocuments() {
       continue;
     }
 
+    await db.documents.put({
+      ...localDoc,
+      title: serverDoc.title,
+      content: serverDoc.content,
+      role: serverDoc.role,
+      isOwner: serverDoc.isOwner,
+      ownerId: serverDoc.ownerId,
+      version: serverDoc.version,
+      lamportClock: serverDoc.lamportClock,
+      synced: true,
+    });
+
     // Server has a newer version
     if (serverDoc.version > localDoc.version) {
-      const latest = await pullDocument(
-        serverDoc.id,
-        localDoc.version
-      );
+      const latest = await pullDocument(serverDoc.id, localDoc.version);
 
       if (latest) {
         await mergeDocument(latest);

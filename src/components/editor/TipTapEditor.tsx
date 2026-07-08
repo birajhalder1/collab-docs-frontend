@@ -1,51 +1,3 @@
-// "use client";
-
-// import { useMemo } from "react";
-// import { useEditor, EditorContent } from "@tiptap/react";
-// import Collaboration from "@tiptap/extension-collaboration";
-// import StarterKit from "@tiptap/starter-kit";
-// import { createCollaborationContext } from "@/collaboration/provider";
-// import Toolbar from "./Toolbar";
-
-// interface TipTapEditorProps {
-//   documentId: string;
-// }
-
-// export default function TipTapEditor({ documentId }: TipTapEditorProps) {
-//   const collaboration = useMemo(
-//     () => createCollaborationContext(documentId),
-//     [documentId],
-//   );
-
-//   const editor = useEditor({
-//     immediatelyRender: false,
-
-//     extensions: [
-//       StarterKit.configure({
-//         undoRedo: false,
-//       }),
-
-//       Collaboration.configure({
-//         document: collaboration.doc,
-//       }),
-//     ],
-//   });
-
-//   if (!editor) {
-//     return null;
-//   }
-
-//   return (
-//     <>
-//       <Toolbar editor={editor} />
-
-//       <div className="rounded-lg border bg-white">
-//         <EditorContent editor={editor} className="min-h-150 p-6" />
-//       </div>
-//     </>
-//   );
-// }
-
 "use client";
 
 import { useEffect } from "react";
@@ -57,25 +9,41 @@ import Toolbar from "./Toolbar";
 interface TipTapEditorProps {
   content: string;
   onChange: (content: string) => void;
+  editable?: boolean;
 }
 
-export default function TipTapEditor({ content, onChange }: TipTapEditorProps) {
+export default function TipTapEditor({
+  content,
+  onChange,
+  editable = true,
+}: TipTapEditorProps) {
   const editor = useEditor({
     immediatelyRender: false,
+
+    editable,
 
     extensions: [StarterKit, Underline],
 
     content,
 
     onUpdate({ editor }) {
+      if (!editable) return;
+
       onChange(editor.getHTML());
     },
   });
 
+  // Update editable state dynamically
   useEffect(() => {
     if (!editor) return;
 
-    // Don't overwrite while the editor is focused.
+    editor.setEditable(editable);
+  }, [editable, editor]);
+
+  // Sync content from parent
+  useEffect(() => {
+    if (!editor) return;
+
     if (editor.isFocused) return;
 
     if (editor.getHTML() !== content) {
@@ -89,14 +57,13 @@ export default function TipTapEditor({ content, onChange }: TipTapEditorProps) {
 
   return (
     <>
-      <Toolbar editor={editor} />
-
-      {/* <div className="rounded-lg border bg-white">
-        <EditorContent editor={editor} className="min-h-150 p-6" />
-      </div> */}
+      {editable && <Toolbar editor={editor} />}
 
       <div className="rounded-lg border bg-white">
-        <EditorContent editor={editor} />
+        <EditorContent
+          editor={editor}
+          className={`${!editable ? "cursor-default" : ""}`}
+        />
       </div>
     </>
   );

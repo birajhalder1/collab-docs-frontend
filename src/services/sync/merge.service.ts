@@ -19,9 +19,17 @@ export async function mergeDocument(remote: PullResponse) {
 
   await db.documents.put({
     ...local,
+
     title: remote.title,
     content: remote.content,
+
     version: remote.version,
+    lamportClock: remote.lamportClock,
+
+    role: remote.role,
+    isOwner: remote.isOwner,
+    ownerId: remote.ownerId,
+
     synced: true,
     updatedAt: Date.now(),
   });

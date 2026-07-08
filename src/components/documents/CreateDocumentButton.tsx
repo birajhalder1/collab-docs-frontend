@@ -25,6 +25,8 @@ export default function CreateDocumentButton() {
       id,
       title: "Untitled Document",
       content: "",
+      role: "owner",
+      isOwner: true,
       ownerId: "demo-user",
       lamportClock: now,
       version: 1,

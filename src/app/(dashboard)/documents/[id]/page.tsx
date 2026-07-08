@@ -1,15 +1,16 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import { socket } from "@/services/socket/socket";
-import TipTapEditor from "@/components/editor/TipTapEditor";
-import SaveStatus from "@/components/editor/EditorStatus";
-import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
+import { socket } from "@/services/socket/socket";
 import { useDocumentStore } from "@/store/document.store";
 import { DocumentEntity } from "@/types/document";
 import { useDebounce } from "@/hooks/useDebounce";
+
+import TipTapEditor from "@/components/editor/TipTapEditor";
+import SaveStatus from "@/components/editor/EditorStatus";
 
 interface PageProps {
   params: Promise<{
@@ -35,10 +36,14 @@ export default function DocumentPage({ params }: PageProps) {
     "typing" | "saving" | "saved" | "syncing" | "synced" | "offline"
   >("saved");
 
+  // ---------------------------
   // Load document
+  // ---------------------------
   useEffect(() => {
     async function load() {
       const doc = await getDocument(id);
+      console.log("doc-----------", doc);
+      
 
       if (!doc) return;
 
@@ -50,18 +55,23 @@ export default function DocumentPage({ params }: PageProps) {
     load();
   }, [id, getDocument]);
 
-  // Typing Status
+  const isEditable = document?.role === "owner" || document?.role === "editor";
+
   useEffect(() => {
     if (!document) return;
 
-    if (title !== document.title || content !== document.content) {
+    if (
+      isEditable &&
+      (title !== document.title || content !== document.content)
+    ) {
       setStatus("typing");
     }
-  }, [title, content, document]);
+  }, [title, content, document, isEditable]);
 
-  // Auto Save
   useEffect(() => {
     if (!document) return;
+
+    if (!isEditable) return;
 
     if (
       debouncedTitle === document.title &&
@@ -71,26 +81,30 @@ export default function DocumentPage({ params }: PageProps) {
     }
 
     const save = async () => {
-      setStatus("saving");
+      try {
+        setStatus("saving");
 
-      await updateDocument(document.id, {
-        title: debouncedTitle,
-        content: debouncedContent,
-        updatedAt: Date.now(),
-      });
+        await updateDocument(document.id, {
+          title: debouncedTitle,
+          content: debouncedContent,
+          updatedAt: Date.now(),
+        });
 
-      setDocument({
-        ...document,
-        title: debouncedTitle,
-        content: debouncedContent,
-        updatedAt: Date.now(),
-      });
+        setDocument({
+          ...document,
+          title: debouncedTitle,
+          content: debouncedContent,
+          updatedAt: Date.now(),
+        });
 
-      setStatus("saved");
+        setStatus("saved");
+      } catch (err) {
+        console.error(err);
+      }
     };
 
     save();
-  }, [debouncedTitle, debouncedContent, document, updateDocument]);
+  }, [debouncedTitle, debouncedContent, document, updateDocument, isEditable]);
 
   useEffect(() => {
     if (!document) return;
@@ -100,7 +114,7 @@ export default function DocumentPage({ params }: PageProps) {
     });
 
     socket.on("joined", (data) => {
-      console.log("Joined document", data);
+      console.log("Joined", data);
     });
 
     socket.on("error", (err) => {
@@ -116,26 +130,21 @@ export default function DocumentPage({ params }: PageProps) {
   }, [document]);
 
   if (!document) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        Loading...
-      </div>
-    );
+    return <div>Loading...</div>;
   }
 
   return (
-    <div className="mx-auto max-w-6xl p-1">
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/documents"
-            className="rounded-lg p-2 transition hover:bg-gray-100"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
+    <div className="mx-auto max-w-5xl space-y-6">
+      <div className="flex items-center gap-4">
+        <Link href="/documents">
+          <ArrowLeft />
+        </Link>
 
+        <div className="flex-1">
           <input
             value={title}
+            readOnly={!isEditable}
+            disabled={!isEditable}
             onChange={(e) => setTitle(e.target.value)}
             onBlur={() => {
               if (title.trim() === "") {
@@ -143,14 +152,26 @@ export default function DocumentPage({ params }: PageProps) {
               }
             }}
             placeholder="Untitled Document"
-            className="w-full bg-transparent text-3xl font-bold outline-none"
+            className={`w-full bg-transparent text-3xl font-bold outline-none ${
+              !isEditable ? "cursor-not-allowed text-gray-500" : ""
+            }`}
           />
         </div>
 
         <SaveStatus status={status} />
       </div>
 
-      <TipTapEditor content={content} onChange={setContent} />
+      {!isEditable && (
+        <div className="rounded-md bg-yellow-100 p-3 text-sm text-yellow-700">
+          You have <strong>Viewer</strong> access. This document is read-only.
+        </div>
+      )}
+
+      <TipTapEditor
+        content={content}
+        onChange={setContent}
+        editable={isEditable}
+      />
     </div>
   );
 }

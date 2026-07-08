@@ -38,11 +38,23 @@ export interface PushRequest {
   operations: SyncOperation[];
 }
 
+// export interface PullResponse {
+//   documentId: string;
+//   version: number;
+//   lamportClock: number;
+//   title: string;
+//   content: string;
+//   operations: SyncOperation[];
+// }
+
 export interface PullResponse {
   documentId: string;
-  version: number;
-  lamportClock: number;
   title: string;
   content: string;
+  version: number;
+  lamportClock: number;
+  role: "owner" | "editor" | "viewer";
+  isOwner: boolean;
+  ownerId: string;
   operations: SyncOperation[];
 }
