@@ -19,7 +19,7 @@ export default function DocumentsPage() {
       } catch (err) {
         console.error("Failed to sync documents", err);
       }
-    };
+    }; 
 
     loadDocuments();
   }, []);
