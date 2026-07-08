@@ -36,6 +36,21 @@ export default function CreateDocumentButton() {
       synced: false,
     });
 
+    console.log("create docs", {
+      id,
+      title: "Untitled Document",
+      content: "",
+      role: "owner",
+      isOwner: true,
+      ownerId: "demo-user",
+      lamportClock: now,
+      version: 1,
+      createdAt: now,
+      updatedAt: now,
+      deleted: false,
+      synced: false,
+    });
+
     router.push(`/documents/${id}`);
   };
 
