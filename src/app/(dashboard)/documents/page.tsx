@@ -13,9 +13,9 @@ export default function DocumentsPage() {
   useEffect(() => {
     const loadDocuments = async () => {
       try {
-        console.log("Fetching documents from server...");
+        // console.log("Fetching documents from server...");
         await pullAllDocuments(); 
-        console.log("Documents synced successfully.");
+        // console.log("Documents synced successfully.");
       } catch (err) {
         console.error("Failed to sync documents", err);
       }

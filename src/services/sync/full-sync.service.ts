@@ -8,8 +8,6 @@ export async function pullAllDocuments() {
   const response = await api.get("/documents");
 
   const serverDocuments = response.data.data;
-  console.log("serverDoc", serverDocuments);
-
   for (const serverDoc of serverDocuments) {
     // Check if the document already exists locally
     const localDoc = await db.documents.get(serverDoc.id);

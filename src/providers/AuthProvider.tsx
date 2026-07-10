@@ -21,7 +21,7 @@ export default function AuthProvider({
     if (PUBLIC_ROUTES.includes(pathname)) return;
 
     // Already logged in, don't refresh
-    console.log("accessToken", accessToken);
+    // console.log("accessToken", accessToken);
 
     if (accessToken) return;
 

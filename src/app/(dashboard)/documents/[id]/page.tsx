@@ -11,6 +11,8 @@ import { useDebounce } from "@/hooks/useDebounce";
 
 import TipTapEditor from "@/components/editor/TipTapEditor";
 import SaveStatus from "@/components/editor/EditorStatus";
+import { mergeDocument } from "@/services/sync/merge.service";
+import { pullDocument } from "@/services/sync/pull.service";
 
 interface PageProps {
   params: Promise<{
@@ -43,7 +45,6 @@ export default function DocumentPage({ params }: PageProps) {
     async function load() {
       const doc = await getDocument(id);
       console.log("doc-----------", doc);
-      
 
       if (!doc) return;
 
@@ -107,6 +108,8 @@ export default function DocumentPage({ params }: PageProps) {
   }, [debouncedTitle, debouncedContent, document, updateDocument, isEditable]);
 
   useEffect(() => {
+    console.log("load-----------------", document);
+
     if (!document) return;
 
     socket.emit("join-document", {
@@ -117,13 +120,29 @@ export default function DocumentPage({ params }: PageProps) {
       console.log("Joined", data);
     });
 
+    socket.on("document-updated", async () => {
+      if (!document) return;
+
+      console.log("Remote update");
+      const latest = await pullDocument(document.id, document.version);
+      if (!latest) return;
+
+      await mergeDocument(latest);
+      const updated = await getDocument(document.id);
+      if (!updated) return;
+
+      setDocument(updated);
+      setTitle(updated.title);
+      setContent(updated.content);
+    });
+
     socket.on("error", (err) => {
       console.error(err);
     });
 
     return () => {
       socket.emit("leave-document");
-
+      socket.off("document-updated");
       socket.off("joined");
       socket.off("error");
     };

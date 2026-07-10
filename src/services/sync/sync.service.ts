@@ -79,7 +79,7 @@ export async function syncDocuments() {
         synced: true,
       });
 
-      console.log(`Synced ${operations.length} operations`);
+      // console.log(`Synced ${operations.length} operations`);
     }
   } catch (error) {
     console.error(error);
