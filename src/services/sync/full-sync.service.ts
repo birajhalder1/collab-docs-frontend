@@ -6,8 +6,19 @@ import { mergeDocument } from "./merge.service";
 export async function pullAllDocuments() {
   // Get all documents available to the user
   const response = await api.get("/documents");
-
   const serverDocuments = response.data.data;
+
+  const localDocuments = await db.documents.toArray();
+  const serverIds = new Set(serverDocuments.map((doc: any) => doc.id));
+
+  // Remove documents that no longer exist on server
+  for (const localDoc of localDocuments) {
+    if (!serverIds.has(localDoc.id)) {
+      await db.documents.delete(localDoc.id);
+      await db.syncQueue.where("documentId").equals(localDoc.id).delete();
+    }
+  }
+
   for (const serverDoc of serverDocuments) {
     // Check if the document already exists locally
     const localDoc = await db.documents.get(serverDoc.id);
