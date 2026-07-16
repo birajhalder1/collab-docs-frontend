@@ -5,14 +5,16 @@ import { FileText, Users, History, Wifi } from "lucide-react";
 
 import { getDashboard } from "@/services/dashboard.service";
 import { socket } from "@/services/socket/socket";
+import { useConnectionStore } from "@/store/connection.store";
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({
     documents: 0,
     collaborators: 0,
     versions: 0,
-    status: "Offline",
+    // status: "Offline",
   });
+  const status = useConnectionStore((state) => state.status);
 
   useEffect(() => {
     async function loadDashboard() {
@@ -28,12 +30,14 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    socket.on("dashboard:update", (data) => {
+    const handleDashboardUpdate = (data: any) => {
       setStats(data);
-    });
+    };
+
+    socket.on("dashboard:update", handleDashboardUpdate);
 
     return () => {
-      socket.off("dashboard:update");
+      socket.off("dashboard:update", handleDashboardUpdate);
     };
   }, []);
 
@@ -55,7 +59,7 @@ export default function DashboardPage() {
     },
     {
       title: "Status",
-      value: stats.status,
+      value: status,
       icon: Wifi,
     },
   ];

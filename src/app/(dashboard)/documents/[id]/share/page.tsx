@@ -3,6 +3,7 @@
 import { useState } from "react";
 import api from "@/services/api";
 import Button from "@/components/ui/Button";
+import { toast } from "sonner";
 
 interface Props {
   documentId: string;
@@ -56,10 +57,10 @@ export default function ShareDialog({
 
       await loadCollaborators();
 
-      alert("Shared successfully");
+      toast.success("Shared successfully");
     } catch (err) {
       console.error(err);
-      alert("Share failed");
+      toast.warning("Share failed");
     } finally {
       setLoading(false);
     }

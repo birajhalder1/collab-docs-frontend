@@ -13,6 +13,7 @@ import { loginSchema, LoginFormData } from "@/lib/validations/auth";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -36,11 +37,11 @@ export default function LoginForm() {
         setAuth(response.data.data.user, response.data.data.accessToken);
         useAuthStore.getState().setAuth(response.data.data.user, response.data.data.accessToken);
         router.push("/dashboard");
-        alert("Login successful!");
+        toast.success("Login successful!");
       }
     } catch (error) {
       console.error(error);
-      alert("Login failed");
+      toast.error("Login failed. Please check your email and password.");
     } finally {
       setLoading(false);
     }

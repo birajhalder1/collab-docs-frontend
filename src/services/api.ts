@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useAuthStore } from "@/store/auth.store";
+import { toast } from "sonner";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -50,6 +51,10 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         useAuthStore.getState().logout();
+
+        toast.error("Your session has expired. Please log in again.", {
+          id: "session-expired",
+        });
 
         if (typeof window !== "undefined") {
           window.location.href = "/login";

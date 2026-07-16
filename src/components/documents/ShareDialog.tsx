@@ -6,6 +6,7 @@ import {
   shareDocument,
   removeCollaborator,
 } from "@/services/document.service";
+import { toast } from "sonner";
 
 interface ShareDialogProps {
   open: boolean;
@@ -49,7 +50,7 @@ export default function ShareDialog({
 
   const handleShare = async () => {
     if (!email.trim()) {
-      alert("Please enter an email.");
+      toast.warning("Please enter an email.");
       return;
     }
 
@@ -62,23 +63,56 @@ export default function ShareDialog({
 
       await loadCollaborators();
 
-      alert("Collaborator added.");
+      toast.success("Collaborator added.");
     } catch (err: any) {
-      alert(err?.response?.data?.message ?? "Failed to share document.");
+      toast.warning(
+        err?.response?.data?.message ?? "Failed to share document.",
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const handleRemove = async (userId: string) => {
-    if (!confirm("Remove collaborator?")) return;
+  // const handleRemove = async (userId: string) => {
+  //   if (!confirm("Remove collaborator?")) return;
 
-    try {
-      await removeCollaborator(documentId, userId);
-      await loadCollaborators();
-    } catch (err) {
-      console.error(err);
-    }
+  //   try {
+  //     await removeCollaborator(documentId, userId);
+  //     await loadCollaborators();
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
+
+  const handleRemove = (userId: string) => {
+    toast("Remove collaborator?", {
+      description: "This action cannot be undone.",
+      duration: Infinity,
+
+      action: {
+        label: "Remove",
+        onClick: async () => {
+          try {
+            await removeCollaborator(documentId, userId);
+            await loadCollaborators();
+
+            toast.success("Collaborator removed successfully.");
+          } catch (err) {
+            console.error(err);
+
+            toast.error("Failed to remove collaborator.");
+          }
+        },
+      },
+
+      cancel: {
+        label: "Cancel",
+        onClick: () => {
+          // Optional: do nothing or show a message
+          // toast.info("Cancelled");
+        },
+      },
+    });
   };
 
   if (!open) return null;

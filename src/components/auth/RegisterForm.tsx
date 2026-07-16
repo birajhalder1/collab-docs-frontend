@@ -12,6 +12,7 @@ import api from "@/services/api";
 import { registerSchema, RegisterFormData } from "@/lib/validations/register";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function RegisterForm() {
   const [loading, setLoading] = useState(false);
@@ -42,12 +43,12 @@ export default function RegisterForm() {
           password: "",
           confirmPassword: "",
         });
-        alert("Registration successful!");
+        toast.success("Registration successful!");
         router.push("/login");
       }
     } catch (error) {
       console.error(error);
-      alert("Registration failed");
+      toast.warning("Registration failed");
     } finally {
       setLoading(false);
     }
